@@ -7,15 +7,15 @@ import kotlinx.serialization.modules.SerializersModule
 
 @OptIn(ExperimentalSerializationApi::class)
 class KJsonSchema(
-    override val serializersModule: SerializersModule = defaultModule,
+  override val serializersModule: SerializersModule = defaultModule,
 ) : SerialFormat {
-    fun <T> generate(
-        serializer: SerializationStrategy<T>,
-    ): Any {
-        throw NotImplementedError()
-    }
+  fun <T> generate(
+    serializer: SerializationStrategy<T>,
+  ): Any {
+    throw NotImplementedError()
+  }
 
-    companion object {
-        val defaultModule = SerializersModule { }
-    }
+  companion object {
+    val defaultModule = SerializersModule { }
+  }
 }
