@@ -2,44 +2,55 @@ package dev.hoepelman.kjsonschema.model
 
 /** A JSON Schema. */
 sealed interface JsonSchema {
+
   /** A normal (object) JSON Schema. */
-  data class Schema(
-    val `$schema`: String? = null,
-    val `$id`: String? = null,
-    val title: String? = null,
-    val properties: Map<String, JsonSchema>? = null,
-    val type: List<SimpleType>? = null,
-  ) : JsonSchema {
-    private constructor(builder: Builder) : this(
-      builder.`$schema`,
-      builder.`$id`,
-      builder.title,
-      builder.properties,
-      builder.type
-    )
+  interface Schema: JsonSchema {
+    val `$schema`: String?
+    val `$id`: String?
+    val title: String?
+    val type: List<SchemaType>?
 
-    class Builder(dialect: Dialect) {
-      var `$schema`: String? = null
-      var `$id`: String? = null
-      var title: String? = null
-      val properties: Map<String, JsonSchema>? = null
-      var type: List<SimpleType>? = null
-      fun build() = Schema(this)
+    val properties: Map<String, JsonSchema>?
 
-      init {
-        `$schema` = dialect.uri
-      }
-    }
+    val otherFields: Map<String, Any>?
+
+    val dialect: Dialect?
+      get() = `$schema`?.let(Dialect::from)
+  }
+
+
+  data class Builder(
+    override var `$schema`: String? = null,
+    override var `$id`: String? = null,
+    override var title: String? = null,
+    override var properties: Map<String, JsonSchema>? = null,
+    override var type: List<SchemaType>? = null,
+  ) : Schema {
+    override var dialect: Dialect?
+      get() = super.dialect
+      set(dialect) { `$schema` = dialect?.uri }
   }
 
   /** A boolean JSON Schema. */
-  @JvmInline value class BooleanSchema(val value: Boolean) : JsonSchema
+  @JvmInline
+  value class BooleanSchema(val value: Boolean = true) : JsonSchema {}
 
   companion object {
     inline fun jsonSchema(
-      dialect: Dialect = Dialect.V2020_12,
-      block: Schema.Builder.() -> Unit
-    ): Schema = Schema.Builder(dialect).apply(block).build()
+      block: Builder.() -> Unit
+    ): Schema = Builder().apply(block)
+
     fun jsonSchema(value: Boolean): JsonSchema = BooleanSchema(value)
+  }
+
+  /** A non-exhaustive enum of all defined fields in a JSON schema.*/
+  enum class KnownField(val fieldName: String) {
+    SCHEMA_VERSION("\$schema"),
+    ID("\$id"),
+    TITLE("title"),
+    TYPE("type"),
+    PROPERTIES("properties");
+
+
   }
 }

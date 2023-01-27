@@ -1,9 +1,10 @@
 package dev.hoepelman.kjsonschema.model
 
+
 /** JSON schema "simple" types
  * @see <a href="https://json-schema.org/draft/2020-12/json-schema-validation.html#name-type">validation type keyword</a>
  * */
-enum class SimpleType {
+enum class SchemaType {
   ARRAY,
   BOOLEAN,
   INTEGER,
